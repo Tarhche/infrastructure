@@ -123,8 +123,6 @@ jobs:
             docker compose -f compose.nats.yaml --project-name nats up --pull always --detach
             docker compose -f compose.docker.yaml --project-name docker up --pull always --detach
             docker compose -f compose.docker_dashboard.yaml --project-name docker_dashboard up --pull always --detach
-            docker compose -f compose.app.yaml --project-name app up --pull always --detach
-            docker compose -f compose.frontend.yaml --project-name frontend up --pull always --detach
             docker compose -f compose.proxy.yaml --project-name proxy up --pull always --detach
 
             sudo rm -rf /tmp/deployment_infrastructure
