@@ -1,0 +1,68 @@
+name: 'Docker Build Action'
+description: 'Builds a Docker image using a specified Dockerfile and context'
+
+inputs:
+  aws-access-key-id:
+    description: 'AWS access key id'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS secret access key'
+    required: true
+  aws-region:
+    description: 'AWS region'
+    required: true
+  validate:
+    description: 'Determines if a round of validation should be done'
+    required: true
+    default: 'no'
+  plan:
+    description: 'Determines if terraform plan should be called'
+    required: true
+    default: 'no'
+  apply:
+    description: 'Determines if terraform apply should be called'
+    required: true
+    default: 'no'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Format
+      if: ${{ inputs.validate == 'true' }}
+      run: terraform fmt -check
+      shell: bash
+      continue-on-error: false
+
+    - name: Terraform Init
+      run: terraform init
+      shell: bash
+
+    - name: Terraform Validate
+      if: ${{ inputs.validate == 'true' }}
+      run: terraform validate -no-color
+      shell: bash
+      continue-on-error: false
+
+    - name: Terraform Plan
+      if: ${{ inputs.plan == 'true' }}
+      run: terraform plan -no-color -input=false
+      shell: bash
+      continue-on-error: false
+
+    - name: Terraform Apply
+      if: ${{ inputs.apply == 'true' }}
+      shell: bash
+      run: terraform apply -auto-approve -input=false

@@ -1,0 +1,131 @@
+name: CI and CD
+
+on:
+  push:
+  pull_request:
+
+env:
+  TF_VAR_project_name: tarhche
+  TF_VAR_instance_name: backend
+
+  PROXY_IMAGE_NAME: proxy
+
+  EC2_SSH_ADDRESS: ${{ secrets.EC2_SSH_ADDRESS }}
+  EC2_SSH_ENDPOINT: ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_SSH_ADDRESS }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Terraform validate and apply
+        uses: ./.github/actions/terraform
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          validate: true
+          apply: true
+
+      - name: Build image
+        uses: ./.github/actions/docker-build
+        with:
+          context: ./proxy
+          dockerfile: ./proxy/Dockerfile
+          image-name: ${{ env.PROXY_IMAGE_NAME }}
+          push: false
+          container-registry: ghcr.io
+
+  cd:
+    runs-on: ubuntu-latest
+
+    if: ${{ format('refs/heads/{0}', github.event.repository.default_branch) == github.ref }}
+
+    permissions:
+      packages: write
+      contents: read
+
+    needs:
+      - ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Terraform validate and apply
+        uses: ./.github/actions/terraform
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          validate: true
+          apply: true
+
+      - name: Build and push proxy image
+        uses: ./.github/actions/docker-build
+        with:
+          context: ./proxy
+          dockerfile: ./proxy/Dockerfile
+          image-name: ${{ env.PROXY_IMAGE_NAME }}
+          push: true
+          container-registry: ghcr.io
+          container-registry-username: ${{ github.actor }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy services
+        run: |
+          # Setup ssh key
+          echo '${{ secrets.EC2_SSH_PRIVATE_KEY }}' > ~/ec2-key.pem
+          chmod 400 ~/ec2-key.pem
+
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $EC2_SSH_ADDRESS >> ~/.ssh/known_hosts
+
+          # Ensure remote directory exists
+          ssh -q -i ~/ec2-key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_SSH_ENDPOINT > /dev/null 2>&1 << 'EOF'
+            export VOLUME_PATH='${{ secrets.VOLUME_PATH }}'
+
+            sudo mkdir -p /tmp/deployment_infrastructure
+            sudo chown ${{ secrets.EC2_SSH_USER }}:${{ secrets.EC2_SSH_USER }} /tmp/deployment_infrastructure
+
+            # create volumes directories
+            sudo mkdir -p $VOLUME_PATH/mongodb/db
+            sudo mkdir -p $VOLUME_PATH/mongodb/configdb
+            sudo mkdir -p $VOLUME_PATH/nats
+          EOF
+
+          # Copy files
+          scp -q -i ~/ec2-key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./* $EC2_SSH_ENDPOINT:/tmp/deployment_infrastructure > /dev/null 2>&1
+
+          # Connect and deploy services
+          ssh -q -i ~/ec2-key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_SSH_ENDPOINT > /dev/null 2>&1 << 'EOF'
+            export VOLUME_PATH='${{ secrets.VOLUME_PATH }}'
+
+            export MONGO_USERNAME='${{ secrets.MONGO_USERNAME }}'
+            export MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD }}'
+
+            export DASHBOARD_MONGO_USERNAME='${{ secrets.DASHBOARD_MONGO_USERNAME }}'
+            export DASHBOARD_MONGO_PASSWORD='${{ secrets.DASHBOARD_MONGO_PASSWORD }}'
+            export DASHBOARD_MONGO_MONGODB_URL='mongodb://${{ secrets.MONGO_USERNAME }}:${{ secrets.MONGO_PASSWORD }}@mongodb:27017'
+
+            export PROXY_IMAGE='${{ secrets.PROXY_IMAGE }}'
+
+            export PORTAINER_ADMIN_PASSWORD='${{ secrets.PORTAINER_ADMIN_PASSWORD }}'
+
+            # Run Docker Compose
+            cd /tmp/deployment_infrastructure/
+
+            docker compose -f compose.mongodb.yaml --project-name mongodb up --pull always --detach
+            docker compose -f compose.mongodb_dashboard.yaml --project-name mongodb_dashboard up --pull always --detach
+            docker compose -f compose.nats.yaml --project-name nats up --pull always --detach
+            docker compose -f compose.docker.yaml --project-name docker up --pull always --detach
+            docker compose -f compose.docker_dashboard.yaml --project-name docker_dashboard up --pull always --detach
+            docker compose -f compose.app.yaml --project-name app up --pull always --detach
+            docker compose -f compose.frontend.yaml --project-name frontend up --pull always --detach
+            docker compose -f compose.proxy.yaml --project-name proxy up --pull always --detach
+
+            sudo rm -rf /tmp/deployment_infrastructure
+          EOF
