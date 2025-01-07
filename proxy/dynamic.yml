@@ -1,0 +1,70 @@
+# HTTP routers, services, and middlewares
+http:
+  routers:
+
+    # Backend subdomain
+    backend:
+      rule: HostRegexp(`^backend\..+\..+$`)
+      entryPoints:
+        - http
+      service: app-service
+      middlewares:
+        - add-headers
+
+    # Docker Dashboard subdomain
+    dockerdashboard:
+      rule: HostRegexp(`^dockerdashboard\..+\..+$`)
+      entryPoints:
+        - http
+      service: docker-dashboard-service
+      middlewares:
+        - add-headers
+
+    # MongoDB Dashboard subdomain
+    mongodashboard:
+      rule: HostRegexp(`^mongodashboard\..+\..+$`)
+      entryPoints:
+        - http
+      service: mongodb-dashboard-service
+      middlewares:
+        - add-headers
+
+    # Catch-all router for unmatched subdomains
+    catch-all:
+      rule: HostRegexp(`.+`)
+      entryPoints:
+        - http
+      service: frontend-service
+      middlewares:
+        - add-headers
+
+  services:
+    frontend-service:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:3000"
+
+    app-service:
+      loadBalancer:
+        servers:
+          - url: "http://app:80"
+
+    docker-dashboard-service:
+      loadBalancer:
+        servers:
+          - url: "http://docker_dashboard:9000"
+
+    mongodb-dashboard-service:
+      loadBalancer:
+        servers:
+          - url: "http://mongodb_dashboard:8081"
+
+  middlewares:
+    # Middleware to add headers to all requests
+    add-headers:
+      headers:
+        customRequestHeaders:
+          X-Real-IP: "{remote_ip}"
+          X-Forwarded-For: "{remote_ip}"
+          X-Forwarded-Proto: "{scheme}"
+          X-Forwarded-Host: "{host}"

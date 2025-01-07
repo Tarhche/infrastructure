@@ -79,7 +79,7 @@ up:
 	docker compose -f compose.nats.yaml --project-name nats up --pull always --detach
 	docker compose -f compose.docker.yaml --project-name docker up --pull always --detach
 	docker compose -f compose.docker_dashboard.yaml --project-name docker_dashboard up --pull always --detach
-	docker compose -f compose.proxy.yaml --project-name proxy up --pull always --detach
+	docker compose -f compose.proxy.yaml --project-name proxy up --pull always --detach --build
 
 down:
 	docker compose -f compose.proxy.yaml --project-name proxy down --volumes --remove-orphans

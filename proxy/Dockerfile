@@ -1,5 +1,6 @@
-FROM nginx:1.26-alpine
+FROM traefik:v3.3
 
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./traefik.yml /etc/traefik/traefik.yml
+COPY ./dynamic.yml /etc/traefik-dynamic/dynamic.yml
 
-EXPOSE 80
+EXPOSE 80 8080

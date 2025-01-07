@@ -1,0 +1,19 @@
+# Define the entry points to listen on port 80 for HTTP
+entryPoints:
+  http:
+    address: ":80"  # Listen on port 80 for HTTP requests
+
+# Enable access logs
+log:
+  level: DEBUG
+  format: common
+  filePath: "/dev/stdout"  # Logs to stdout
+
+# Enable the Traefik dashboard (optional, for debugging purposes)
+api:
+  insecure: true  # Enable insecure dashboard (for local testing, don't use in production)
+  dashboard: true  # Enable the dashboard view
+
+providers:
+  file:
+    directory: /etc/traefik-dynamic
