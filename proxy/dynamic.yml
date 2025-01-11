@@ -8,8 +8,6 @@ http:
       entryPoints:
         - http
       service: app-service
-      middlewares:
-        - add-headers
 
     # Docker Dashboard subdomain
     dockerdashboard:
@@ -17,8 +15,6 @@ http:
       entryPoints:
         - http
       service: docker-dashboard-service
-      middlewares:
-        - add-headers
 
     # MongoDB Dashboard subdomain
     mongodashboard:
@@ -26,8 +22,6 @@ http:
       entryPoints:
         - http
       service: mongodb-dashboard-service
-      middlewares:
-        - add-headers
 
     # Catch-all router for unmatched subdomains
     catch-all:
@@ -35,8 +29,6 @@ http:
       entryPoints:
         - http
       service: frontend-service
-      middlewares:
-        - add-headers
 
   services:
     frontend-service:
@@ -58,13 +50,3 @@ http:
       loadBalancer:
         servers:
           - url: "http://mongodb_dashboard:8081"
-
-  middlewares:
-    # Middleware to add headers to all requests
-    add-headers:
-      headers:
-        customRequestHeaders:
-          X-Real-IP: "{remote_ip}"
-          X-Forwarded-For: "{remote_ip}"
-          X-Forwarded-Proto: "{scheme}"
-          X-Forwarded-Host: "{host}"
