@@ -86,12 +86,12 @@ resource "aws_volume_attachment" "backend" {
 
 import {
   to = aws_instance.backend
-  id = "i-026c60a5a3cdec06e"
+  id = "i-06d3dcfc254a1de52"
 }
 
 resource "aws_instance" "backend" {
-  ami               = "ami-0a628e1e89aaedf80" # Canonical, Ubuntu, 24.04, amd64 noble image
-  instance_type     = "t2.micro"
+  ami               = "ami-02d9d83052ced9fdd" # Canonical, Ubuntu, 24.04, arm noble image
+  instance_type     = "t4g.small"
   key_name          = "backend"
   availability_zone = "eu-central-1b"
 
@@ -121,9 +121,9 @@ resource "aws_instance" "backend" {
 
     # install docker and sysbox
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    wget https://downloads.nestybox.com/sysbox/releases/v0.6.5/sysbox-ce_0.6.5-0.linux_amd64.deb
-    sudo apt install -y ./sysbox-ce_0.6.5-0.linux_amd64.deb
-    rm ./sysbox-ce_0.6.5-0.linux_amd64.deb
+    wget https://downloads.nestybox.com/sysbox/releases/v0.6.6/sysbox-ce_0.6.6-0.linux_arm64.deb
+    sudo apt install -y ./sysbox-ce_0.6.6-0.linux_arm64.deb
+    rm ./sysbox-ce_0.6.6-0.linux_arm64.deb
 
     # setup
     sudo systemctl enable docker.service
@@ -224,6 +224,7 @@ resource "aws_lb_target_group" "http" {
   }
 }
 
+# can't be imported, that's why the below lines are commented
 # resource "aws_lb_target_group_attachment" "backend_http" {
 #   target_group_arn = aws_lb_target_group.http.arn
 #   target_id        = aws_instance.backend.id
