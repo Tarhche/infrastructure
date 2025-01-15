@@ -86,23 +86,23 @@ resource "aws_volume_attachment" "backend" {
 
 import {
   to = aws_instance.backend
-  id = "i-06d3dcfc254a1de52"
+  id = "i-0ed2ea2eccc9e0815"
 }
 
 resource "aws_instance" "backend" {
-  ami               = "ami-02d9d83052ced9fdd" # Canonical, Ubuntu, 24.04, arm noble image
-  instance_type     = "t4g.small"
+  ami               = "ami-07eef52105e8a2059" # Canonical, Ubuntu, 24.04, amd64 noble image
+  instance_type     = "t3.medium"
   key_name          = "backend"
   availability_zone = "eu-central-1b"
 
   user_data = <<-EOT
     #!/bin/bash
 
-    # volumes
-    sudo mkfs.ext4 /dev/xvdf
+    # volumes - ec2 modifies the device name xvdf to nvme1n1
+    sudo mkfs.ext4 /dev/nvme1n1
     sudo mkdir /volume_01
-    sudo mount /dev/xvdf /volume_01
-    sudo echo "/dev/xvdf /volume_01 ext4 defaults,nofail 0 0" | sudo tee -a /etc/fstab
+    sudo mount /dev/nvme1n1 /volume_01
+    sudo echo "/dev/nvme1n1 /volume_01 ext4 defaults,nofail 0 0" | sudo tee -a /etc/fstab
 
     # tools
     sudo apt install -y wget python3 ca-certificates curl htop jq vim make
@@ -121,9 +121,9 @@ resource "aws_instance" "backend" {
 
     # install docker and sysbox
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    wget https://downloads.nestybox.com/sysbox/releases/v0.6.6/sysbox-ce_0.6.6-0.linux_arm64.deb
-    sudo apt install -y ./sysbox-ce_0.6.6-0.linux_arm64.deb
-    rm ./sysbox-ce_0.6.6-0.linux_arm64.deb
+    wget -O sysbox.deb https://downloads.nestybox.com/sysbox/releases/v0.6.6/sysbox-ce_0.6.6-0.linux_amd64.deb
+    sudo apt install -y ./sysbox.deb
+    rm ./sysbox.deb
 
     # setup
     sudo systemctl enable docker.service
@@ -225,6 +225,7 @@ resource "aws_lb_target_group" "http" {
 }
 
 # can't be imported, that's why the below lines are commented
+# - if it's the first time you create the ec2, uncomment the below code
 # resource "aws_lb_target_group_attachment" "backend_http" {
 #   target_group_arn = aws_lb_target_group.http.arn
 #   target_id        = aws_instance.backend.id

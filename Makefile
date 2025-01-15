@@ -11,7 +11,6 @@ export MONGO_PASSWORD = test‍
 
 export DASHBOARD_MONGO_USERNAME    = username
 export DASHBOARD_MONGO_PASSWORD    = password
-export DASHBOARD_MONGO_MONGODB_URL = mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017
 
 export PROXY_IMAGE = ghcr.io/tarhche/proxy:latest
 

@@ -13,8 +13,8 @@ services:
         max_attempts: 3
       resources:
         limits:
-          cpus: '0.20'
-          memory: 150M
+          cpus: '0.50'
+          memory: 200M
     volumes:
       - ${VOLUME_PATH}/nats:/data
     command: ["--jetstream", "--http_port", "8222", "--port", "4222", "--store_dir", "/data"]

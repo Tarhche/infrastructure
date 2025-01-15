@@ -1,6 +1,6 @@
 services:
   mongodb_dashboard:
-    image: mongo-express
+    image: mongo-express:1-20-alpine3.19
     networks:
       - mongodb
       - mongodb_dashboard
@@ -17,9 +17,12 @@ services:
           cpus: '0.20'
           memory: 150M
     environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_BASICAUTH_USERNAME: ${DASHBOARD_MONGO_USERNAME}
       ME_CONFIG_BASICAUTH_PASSWORD: ${DASHBOARD_MONGO_PASSWORD}
-      ME_CONFIG_MONGODB_URL: ${DASHBOARD_MONGO_MONGODB_URL}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
 
 networks:
   mongodb_dashboard:

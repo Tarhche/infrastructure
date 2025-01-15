@@ -14,13 +14,13 @@ services:
       resources:
         limits:
           cpus: '0.50'
-          memory: 200M
+          memory: 500M
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: adminuser
+      MONGO_INITDB_ROOT_PASSWORD: __mongo_password__
     volumes:
-      - ${VOLUME_PATH}/mongodb/db:/data/db
-      - ${VOLUME_PATH}/mongodb/configdb:/data/configdb
+      - /volume_01/mongodb/db:/data/db
+      - /volume_01/mongodb/configdb:/data/configdb
 
 networks:
   mongodb:
