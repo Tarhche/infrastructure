@@ -7,6 +7,7 @@ services:
       - app
       - mongodb_dashboard
       - docker_dashboard
+      - runner_manager
     deploy:
       mode: replicated
       replicas: 1
@@ -29,8 +30,8 @@ networks:
     name: frontend
   app:
     name: app
-  runner-manager:
-    name: runner-manager
+  runner_manager:
+    name: runner_manager
   mongodb_dashboard:
     name: mongodb_dashboard
     external: true
