@@ -117,7 +117,7 @@ jobs:
           EOF
 
           # Copy files
-          scp -q -i ~/ec2-key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./* $EC2_SSH_ENDPOINT:/tmp/deployment_infrastructure > /dev/null 2>&1
+          scp -q -i ~/ec2-key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./compose.*.yaml $EC2_SSH_ENDPOINT:/tmp/deployment_infrastructure > /dev/null 2>&1
 
           # Connect and deploy services
           ssh -q -i ~/ec2-key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $EC2_SSH_ENDPOINT > /dev/null 2>&1 << 'EOF'
