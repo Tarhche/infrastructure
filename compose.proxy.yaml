@@ -29,6 +29,8 @@ networks:
     name: frontend
   app:
     name: app
+  runner-manager:
+    name: runner-manager
   mongodb_dashboard:
     name: mongodb_dashboard
     external: true
