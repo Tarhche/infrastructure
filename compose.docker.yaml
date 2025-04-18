@@ -13,8 +13,8 @@ services:
         max_attempts: 3
       resources:
         limits:
-          cpus: '0.50'
-          memory: 500M
+          cpus: '2'
+          memory: 2G
     runtime: sysbox-runc
     # privileged: true # To test localy: enable this line and disable runtime
     environment:
