@@ -1,17 +1,17 @@
 # HTTP routers, services, and middlewares
 http:
   middlewares:
-    # Rate limiter
+    # Rate limiter (per IP address)
     ratelimiter:
       rateLimit:
         average: 30
         burst: 40
         period: 1s
 
-    # In flight request limiter
+    # In flight request limiter (total number of requests in flight at a time)
     inflightlimiter:
       inFlightReq:
-        amount: 40
+        amount: 1500
 
   routers:
 
