@@ -1,4 +1,4 @@
-FROM traefik:v3.3
+FROM traefik:v3.4
 
 COPY ./traefik.yml /etc/traefik/traefik.yml
 COPY ./dynamic.yml /etc/traefik-dynamic/dynamic.yml
