@@ -1,33 +1,46 @@
 # HTTP routers, services, and middlewares
 http:
+  middlewares:
+    # Rate limiter
+    ratelimiter:
+      rateLimit:
+        average: 30
+        burst: 40
+        period: 1s
+
+    # In flight request limiter
+    inflightlimiter:
+      inFlightReq:
+        amount: 40
+
   routers:
 
     # Backend subdomain
     backend:
       rule: HostRegexp(`^backend\..+\..+$`)
       entryPoints:
-        - http
+        - webservice
       service: app-service
 
     # Docker Dashboard subdomain
     dockerdashboard:
       rule: HostRegexp(`^dockerdashboard\..+\..+$`)
       entryPoints:
-        - http
+        - webservice
       service: docker-dashboard-service
 
     # MongoDB Dashboard subdomain
     mongodashboard:
       rule: HostRegexp(`^mongodashboard\..+\..+$`)
       entryPoints:
-        - http
+        - webservice
       service: mongodb-dashboard-service
 
     # Catch-all router for unmatched subdomains
     catch-all:
       rule: HostRegexp(`.+`)
       entryPoints:
-        - http
+        - webservice
       service: frontend-service
 
   services:

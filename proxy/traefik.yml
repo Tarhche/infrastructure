@@ -1,7 +1,11 @@
 # Define the entry points to listen on port 80 for HTTP
 entryPoints:
-  http:
+  webservice:
     address: ":80"  # Listen on port 80 for HTTP requests
+    http:
+      middlewares:
+        - ratelimiter@file
+        - inflightlimiter@file
 
 # Enable access logs
 log:
