@@ -15,7 +15,7 @@ services:
       resources:
         limits:
           cpus: '0.20'
-          memory: 150M
+          memory: 200M
     command: >
       --admin-password="${PORTAINER_ADMIN_PASSWORD}"
 
