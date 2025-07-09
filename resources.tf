@@ -132,6 +132,13 @@ resource "aws_instance" "backend" {
     id ubuntu
     newgrp docker
     docker swarm init --advertise-addr 192.168.99.100
+
+    # enable firewall
+    sudo ufw enable
+
+    # open ssh, http related ports
+    sudo ufw allow 22/tcp
+    sudo ufw allow 80/tcp
   EOT
 
   root_block_device {
