@@ -6,6 +6,7 @@ entryPoints:
       middlewares:
         - ratelimiter@file
         - inflightlimiter@file
+        - responseCompressor@file
 
 # Enable access logs
 log:

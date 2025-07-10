@@ -13,6 +13,15 @@ http:
       inFlightReq:
         amount: 2000
 
+    # Compress responses
+    responseCompressor:
+      compress:
+        includedContentTypes:
+          - text/plain
+          - text/html
+          - text/css
+          - text/javascript
+
   routers:
 
     # Backend subdomain
