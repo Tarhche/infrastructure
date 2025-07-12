@@ -19,8 +19,15 @@ http:
         includedContentTypes:
           - text/plain
           - text/html
+          - text/xml
           - text/css
           - text/javascript
+          - application/javascript
+          - application/x-javascript
+          - application/xml
+          - application/xml+rss
+          - image/svg+xml
+          - image/x-icon
 
   routers:
 
@@ -45,9 +52,9 @@ http:
         - webservice
       service: mongodb-dashboard-service
 
-    # Catch-all router for unmatched subdomains
-    catch-all:
-      rule: HostRegexp(`.+`)
+    # Main domain
+    main-domain:
+      rule: HostRegexp(`^[a-z0-9\_\-]+\.[a-z]+$`)
       entryPoints:
         - webservice
       service: frontend-service
