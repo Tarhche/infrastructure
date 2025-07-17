@@ -16,11 +16,11 @@ services:
           cpus: '0.50'
           memory: 500M
     environment:
-      MONGO_INITDB_ROOT_USERNAME: adminuser
-      MONGO_INITDB_ROOT_PASSWORD: __mongo_password__
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
-      - /volume_01/mongodb/db:/data/db
-      - /volume_01/mongodb/configdb:/data/configdb
+      - ${VOLUME_PATH}/mongodb/db:/data/db
+      - ${VOLUME_PATH}/mongodb/configdb:/data/configdb
 
 networks:
   mongodb:
