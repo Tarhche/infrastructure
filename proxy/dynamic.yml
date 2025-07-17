@@ -29,6 +29,13 @@ http:
           - image/svg+xml
           - image/x-icon
 
+    # Docker Dashboard CSRF fix
+    # more details: https://www.portainer.io/blog/origin-invalid-errors-with-portainer-2.27.7-behind-reverse-proxies
+    dockerdashboard-csrf:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+
     # Proxy Dashboard authentication
     proxydashboard-auth:
       basicAuth:
@@ -50,6 +57,8 @@ http:
       entryPoints:
         - webservice
       service: docker-dashboard-service
+      middlewares:
+        - dockerdashboard-csrf
 
     # MongoDB Dashboard subdomain
     mongodashboard:
