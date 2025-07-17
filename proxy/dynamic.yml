@@ -33,21 +33,21 @@ http:
 
     # Backend subdomain
     backend:
-      rule: HostRegexp(`^backend\..+\..+$`)
+      rule: HostRegexp(`^backend\.[a-z0-9\_\-]+\.[a-z]+$`)
       entryPoints:
         - webservice
       service: app-service
 
     # Docker Dashboard subdomain
     dockerdashboard:
-      rule: HostRegexp(`^dockerdashboard\..+\..+$`)
+      rule: HostRegexp(`^dockerdashboard\.[a-z0-9\_\-]+\.[a-z]+$`)
       entryPoints:
         - webservice
       service: docker-dashboard-service
 
     # MongoDB Dashboard subdomain
     mongodashboard:
-      rule: HostRegexp(`^mongodashboard\..+\..+$`)
+      rule: HostRegexp(`^mongodashboard\.[a-z0-9\_\-]+\.[a-z]+$`)
       entryPoints:
         - webservice
       service: mongodb-dashboard-service
