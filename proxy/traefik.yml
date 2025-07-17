@@ -16,8 +16,9 @@ log:
 
 # Enable the Traefik dashboard (optional, for debugging purposes)
 api:
-  insecure: true  # Enable insecure dashboard (for local testing, don't use in production)
-  dashboard: true  # Enable the dashboard view
+  dashboard: true # the dashboard view
+  insecure: false # insecure dashboard (for local testing exposes the dashboard on port 8080, don't use in production)
+  basePath: "/"   # base path for API and dashboard (`/api` and `/dashboard`)
 
 providers:
   file:

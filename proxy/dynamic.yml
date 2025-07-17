@@ -29,6 +29,12 @@ http:
           - image/svg+xml
           - image/x-icon
 
+    # Proxy Dashboard authentication
+    proxydashboard-auth:
+      basicAuth:
+        users: # to generate: htpasswd -nb -B username password
+          - "admin:$2y$05$KPBbjG5.546zDPpw3QnXBObvD68.hBYMshkwCHOGvujrupmPuA1BO"
+
   routers:
 
     # Backend subdomain
@@ -51,6 +57,15 @@ http:
       entryPoints:
         - webservice
       service: mongodb-dashboard-service
+
+    # Proxy Dashboard subdomain
+    proxydashboard:
+      rule: HostRegexp(`^proxydashboard\.[a-z0-9\_\-]+\.[a-z]+$`)
+      entryPoints:
+        - webservice
+      service: api@internal
+      middlewares:
+        - proxydashboard-auth
 
     # Main domain
     main-domain:
