@@ -83,6 +83,13 @@ http:
         - webservice
       service: frontend-service
 
+    # Proxy healthcheck
+    healthcheck:
+      rule: Path(`/healthcheck`)
+      entryPoints:
+        - webservice
+      service: ping@internal
+
   services:
     frontend-service:
       loadBalancer:

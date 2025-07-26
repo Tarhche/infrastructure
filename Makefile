@@ -21,7 +21,7 @@ export PORTAINER_ADMIN_PASSWORD = $$2a$$12$$4xcOa82Ni5rjgQF.v.JWi.i71OyUm3fwmfWi
 validate:
 	terraform validate
 
-fmt: 
+fmt:
 	terraform fmt
 
 init:

@@ -1,3 +1,14 @@
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.5"
+    }
+  }
+}
+
 provider "aws" {
   region = "eu-central-1"
 }
@@ -219,11 +230,13 @@ resource "aws_lb_target_group" "http" {
   lambda_multi_value_headers_enabled = false
 
   health_check {
-    path                = "/"
+    enabled             = true
+    path                = "/healthcheck"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
+    matcher             = "200"
   }
 
   tags = {

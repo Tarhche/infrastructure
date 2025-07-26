@@ -20,6 +20,10 @@ api:
   insecure: false # insecure dashboard (for local testing exposes the dashboard on port 8080, don't use in production)
   basePath: "/"   # base path for API and dashboard (`/api` and `/dashboard`)
 
+# Enable health-check service
+ping:
+  manualRouting: true
+
 providers:
   file:
     directory: /etc/traefik-dynamic
