@@ -13,29 +13,33 @@ export DASHBOARD_MONGO_USERNAME    = username
 export DASHBOARD_MONGO_PASSWORD    = password
 
 export PROXY_IMAGE = ghcr.io/tarhche/proxy:latest
+export AWS_PROFILE = mahdi
 
 # username: admin
 # password: admin-password (in bcrypt, a dollar-sign should be escaped by an arbitrary dollar-sign ($ --> $$))
 export PORTAINER_ADMIN_PASSWORD = $$2a$$12$$4xcOa82Ni5rjgQF.v.JWi.i71OyUm3fwmfWiumgJHIAPGU.uOw3qu
 
 validate:
-	terraform validate
+	terraform -chdir=aws validate
 
 fmt:
-	terraform fmt
+	terraform -chdir=aws fmt
 
 init:
-	terraform init
+	terraform -chdir=aws init
 
 state:
-	terraform state list
+	terraform -chdir=aws state list
 
 plan:
-	terraform plan
+	terraform -chdir=aws plan
 
 apply:
-	terraform apply
-	rm -f terraform.tfstate *.tfstate.*
+	terraform -chdir=aws apply
+	rm -f aws/terraform.tfstate aws/terraform.tfstate.*
+
+refresh:
+	terraform -chdir=aws refresh
 
 public_key:
 	ssh-keygen -y -f ssh-private-key.pem > ssh-public-key.pub
